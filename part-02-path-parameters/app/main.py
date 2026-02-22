@@ -42,6 +42,9 @@ def root() -> dict:
 def fetch_recipe(*, recipe_id: int) -> dict:
     """
     Fetch a single recipe by ID
+    同样的道理，`{recipe_id}` 是一个路径参数，表示在 URL 中这个位置会被一个具体的值替换。
+    当有请求到达 `/recipe/1` 时，`recipe_id` 的值将会是 `1`，并且这个值会被传递给 `fetch_recipe` 函数作为参数。
+    函数内部通过列表推导式从 `RECIPES` 列表中查找对应 ID 的食谱，并返回找到的食谱信息。
     """
 
     result = [recipe for recipe in RECIPES if recipe["id"] == recipe_id]
