@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any, Optional
-
+import certifi
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -36,7 +36,11 @@ def fetch_recipe(
 @router.get("/search/", status_code=200, response_model=RecipeSearchResults)
 def search_recipes(
     *,
-    keyword: str = Query(None, min_length=3, example="chicken"),
+    keyword: str = Query(
+        None,
+        min_length=3,
+        examples=["chicken"],
+    ),
     max_results: Optional[int] = 10,
     db: Session = Depends(deps.get_db),
 ) -> dict:
@@ -61,9 +65,9 @@ def create_recipe(
     return recipe
 
 
-async def get_reddit_top_async(subreddit: str) -> list:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
+async def get_reddit_top_async(subreddit: str) -> list: # async def 定义可被暂停的函数
+    async with httpx.AsyncClient(verify=certifi.where()) as client:
+        response = await client.get(        # await 暂停执行，等待异步操作完成
             f"https://www.reddit.com/r/{subreddit}/top.json?sort=top&t=day&limit=5",
             headers={"User-agent": "recipe bot 0.1"},
         )
@@ -82,6 +86,7 @@ def get_reddit_top(subreddit: str) -> list:
     response = httpx.get(
         f"https://www.reddit.com/r/{subreddit}/top.json?sort=top&t=day&limit=5",
         headers={"User-agent": "recipe bot 0.1"},
+        verify=certifi.where()
     )
     subreddit_recipes = response.json()
     subreddit_data = []
@@ -93,7 +98,7 @@ def get_reddit_top(subreddit: str) -> list:
     return subreddit_data
 
 
-@router.get("/ideas/async")
+@router.get("/ideas/async/")
 async def fetch_ideas_async() -> dict:
     results = await asyncio.gather(
         *[get_reddit_top_async(subreddit=subreddit) for subreddit in RECIPE_SUBREDDITS]

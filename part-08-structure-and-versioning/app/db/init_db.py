@@ -1,9 +1,9 @@
 import logging
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
-from app.db import base  # noqa: F401
-from app.core.config import settings
+import crud, schemas
+from db import base  # noqa: F401
+from core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,7 @@ RECIPES = [
 ]
 
 
-# make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
+# make sure all SQL Alchemy models are imported (db.base) before initializing DB
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28
 

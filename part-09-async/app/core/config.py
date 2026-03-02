@@ -1,7 +1,8 @@
 import pathlib
 
-from pydantic import AnyHttpUrl, BaseSettings, EmailStr, validator
+from pydantic import AnyHttpUrl, EmailStr, validator
 from typing import List, Optional, Union
+from pydantic_settings import BaseSettings
 
 
 # Project Directories
@@ -23,7 +24,7 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    SQLALCHEMY_DATABASE_URI: Optional[str] = "sqlite:///example.db"
+    SQLALCHEMY_DATABASE_URI: Optional[str] = "sqlite:///example_part9.db"
     FIRST_SUPERUSER: EmailStr = "admin@recipeapi.com"
 
     class Config:
