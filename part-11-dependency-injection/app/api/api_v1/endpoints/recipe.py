@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any, Optional
-
+import certifi
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -101,7 +101,7 @@ def update_recipe(
 
 
 async def get_reddit_top_async(subreddit: str) -> list:
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(verify=certifi.where()) as client:
         response = await client.get(
             f"https://www.reddit.com/r/{subreddit}/top.json?sort=top&t=day&limit=5",
             headers={"User-agent": "recipe bot 0.1"},
@@ -117,7 +117,7 @@ async def get_reddit_top_async(subreddit: str) -> list:
     return subreddit_data
 
 
-@router.get("/ideas/async")
+@router.get("/ideas/async/")
 async def fetch_ideas_async(
     user: User = Depends(deps.get_current_active_superuser),
 ) -> dict:

@@ -1,5 +1,7 @@
 1) 初始化 (只做一次)
-- 在项目根目录执行 `alembic init migrations`，目录名建议 migrations。
+- 在项目根目录执行 
+`alembic init migrations`
+目录名建议 migrations。
 - 在 alembic.ini 设置文件名模板，方便按时间排序：
     `file_template = %%(year)d_%%(month).2d_%%(day).2d_%%(hour).2d%%(minute).2d-%%(rev)s_%%(slug)s`
 
@@ -15,9 +17,12 @@ from app.models.recipe import Recipe  # noqa
 - 引入聚合后的 Base：`from app.db.base import Base`
 - 设置 `target_metadata = Base.metadata`
 3) 日常流转
-- 生成脚本：`alembic revision --autogenerate -m "add phone to user"`
+- 生成脚本：
+`alembic revision --autogenerate -m "add phone to user"`
+-m后面的引号部分是操作说明
 - 审核脚本：检查新增/删除/修改是否符合预期（重命名需手工改成 alter_column）。
-- 执行升级，正式的建表：`alembic upgrade head`
+- 执行升级，正式的建表：
+`alembic upgrade head`
 - 回退：`alembic downgrade -1` 或指定版本前缀。
 
 4) 常用命令速查
