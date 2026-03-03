@@ -8,24 +8,8 @@ import FormInput from '../../components/FormInput/FormInput';
 
 const client = new FastAPIClient(config);
 
-const formatErrorMessage = (detail, fallback) => {
-  if (Array.isArray(detail)) {
-    const msgs = detail.map((item) => item?.msg).filter(Boolean);
-    return msgs.length ? msgs.join('；') : fallback;
-  }
-  if (detail && typeof detail === 'object') {
-    if (detail.msg) return detail.msg;
-    return fallback;
-  }
-  if (typeof detail === 'string' && detail.trim().length) {
-    return detail;
-  }
-  return fallback;
-};
-
 const Login = () => {
   const [error, setError] = useState({email: "", password: ""});
-  const [submitError, setSubmitError] = useState("");
   const [loginForm, setLoginForm] = useState({ email: '', password: '' });
 
   const [loading, setLoading] = useState(false)
@@ -34,8 +18,7 @@ const Login = () => {
 
   const onLogin = (e) => {
     e.preventDefault();
-    setError({email: "", password: ""});
-    setSubmitError("");
+    setError(false);
     setLoading(true)
 
     if(loginForm.email.length <= 0)
@@ -55,10 +38,8 @@ const Login = () => {
       })
       .catch( (err) => {
         setLoading(false)
-        const detail = err?.response?.data?.detail;
-        const msg = formatErrorMessage(detail, '登录失败，请检查账号密码或后端服务状态');
-        setSubmitError(msg);
-        console.error(err)
+        setError(true);
+        console.err(err)
       });
   }
 
@@ -78,9 +59,6 @@ const Login = () => {
                 </div>
               </header>
               <form onSubmit={(e) => onLogin(e)}>
-                {submitError ? (
-                  <p className="text-red-500 text-sm mb-3">{submitError}</p>
-                ) : null}
                 <FormInput 
                   type={"text"}
                   name={"email"}

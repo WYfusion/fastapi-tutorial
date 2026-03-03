@@ -12,7 +12,6 @@ const client = new FastAPIClient(config);
 const Home = () => {
 
      const [loading, setLoading] = useState(true)
-     const [error, setError] = useState('')
      const [recipes, setRecipes] = useState([])
      const [searchValue, setSearchValue] = useState("chicken")
 
@@ -29,21 +28,14 @@ const Home = () => {
 
           // SET THE LOADER TO TURE
           setLoading(true)
-          setError('')
 
           // GET THE RECIPIES FROM THE API
-          client.getRecipes(searchValue)
-               .then((data) => {
-                    // SET THE RECIPIES DATA
-                    setRecipes(data?.results || [])
-               })
-               .catch(() => {
-                    setRecipes([])
-                    setError('无法获取菜谱数据。请确认后端服务已启动：http://localhost:8001')
-               })
-               .finally(() => {
-                    setLoading(false)
-               })
+          client.getRecipes(searchValue).then((data) => {
+               setLoading(false)
+
+               // SET THE RECIPIES DATA
+               setRecipes(data?.results)
+          });
      }
 
 
@@ -76,7 +68,6 @@ const Home = () => {
                               {/* <p className="text-base leading-relaxed">
               Sample recipes...</p> */}
                               <div className="mainViewport">
-                                   {error ? <p className="text-red-400 mb-4">{error}</p> : null}
                                    <RecipeTable
                                         recipes={recipes}
                                    />

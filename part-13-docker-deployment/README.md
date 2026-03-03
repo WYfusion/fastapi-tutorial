@@ -5,8 +5,12 @@ Make sure you have Docker and [Docker Compose](https://docs.docker.com/compose/i
 1. Ensure you are in the `part-13-docker-deployment` directory
 2. Run `docker-compose -f docker-compose.local.yml up -d` (this will download the postgres
    image and build the image for the recipe app - takes about 5 mins)
+   `docker compose -f docker-compose.local.yml up -d && docker compose -f docker-compose.local.yml ps`
 3. Visit `http://localhost:8001/docs`
 
+`cd /d/code/ultimate-fastapi-tutorial/part-13-docker-deployment`
+`docker compose -f docker-compose.local.yml up -d`
+`docker compose -f docker-compose.local.yml ps`
 
 Windows Users: Having problems getting the volume to work properly? Review the following resources:
 

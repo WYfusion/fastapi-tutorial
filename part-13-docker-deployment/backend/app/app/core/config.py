@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 from pydantic import AnyHttpUrl, BaseSettings, EmailStr, validator
@@ -21,14 +22,21 @@ class Settings(BaseSettings):
     # "http://localhost:8080", "http://local.dockertoolbox.tiangolo.com"]'
     BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = [
         "http://localhost:3000",
+        "http://127.0.0.1:3000",
         "http://localhost:8001",  # type: ignore
+        "http://127.0.0.1:8001",  # type: ignore
     ]
 
     # Origins that match this regex OR are in the above list are allowed
     BACKEND_CORS_ORIGIN_REGEX: Optional[
         str
-    ] = "https.*\.(netlify.app|herokuapp.com)"  # noqa: W605
-
+    ] = (
+        r"https.*\.(netlify.app|herokuapp.com)"
+        r"|http://(localhost|127\.0\.0\.1)(:\d+)?"
+        r"|http://172\.(1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3}(:\d+)?"
+        r"|http://192\.168\.\d{1,3}\.\d{1,3}(:\d+)?"
+        r"|http://10\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?"
+    )  # noqa: W605
     @validator("BACKEND_CORS_ORIGINS", pre=True)
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str) and not v.startswith("["):
@@ -37,7 +45,9 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    SQLALCHEMY_DATABASE_URI: str = "postgres://"
+    SQLALCHEMY_DATABASE_URI: str = os.getenv(
+        "DATABASE_URL", "postgresql://postgres:password@localhost:5433/app"
+    )
     FIRST_SUPERUSER: EmailStr = "admin@recipeapi.com"
     FIRST_SUPERUSER_PW: str = "CHANGEME"
 
