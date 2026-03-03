@@ -43,7 +43,7 @@ def fetch_recipe(
 @router.get("/search/", status_code=200, response_model=RecipeSearchResults)
 def search_recipes(
     *,
-    keyword: str = Query(None, min_length=3, example="chicken"),
+    keyword: str = Query(None, min_length=3, examples=["chicken"]),
     max_results: Optional[int] = 10,
     db: Session = Depends(deps.get_db),
 ) -> dict:

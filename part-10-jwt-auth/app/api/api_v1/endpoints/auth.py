@@ -24,6 +24,11 @@ def login(
     Get the JWT for a user with data from OAuth2 request form body.
     """
 
+    # 这里是接受来自于前端的登录请求，包含用户名和密码。我们使用 authenticate 函数来验证用户的凭据。
+    # 前端的请求中的用户名后端这里当作了email来处理，所以 authenticate 函数会在数据库中查找对应的用户记录，并验证密码是否正确。
+    # part-10-jwt-auth/app/core/auth.py的26-31行 db.query(User).filter(User.email == email).first() 作用是找到User.email字段和前端传过来的用户名相匹配的第一个用户记录。
+    # 也就是说，前端传过来的用户名应该是用户的email地址。
+    # 
     user = authenticate(email=form_data.username, password=form_data.password, db=db)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")

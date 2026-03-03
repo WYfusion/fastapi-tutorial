@@ -8,9 +8,31 @@ import FormInput from '../../components/FormInput/FormInput';
 
 const client = new FastAPIClient(config);
 
+const formatErrorMessage = (detail, fallback) => {
+  if (Array.isArray(detail)) {
+    const msgs = detail.map((item) => item?.msg).filter(Boolean);
+    return msgs.length ? msgs.join('；') : fallback;
+  }
+  if (detail && typeof detail === 'object') {
+    if (detail.msg) return detail.msg;
+    return fallback;
+  }
+  if (typeof detail === 'string' && detail.trim().length) {
+    return detail;
+  }
+  return fallback;
+};
+
 const SignUp = () => {
-  const [error, setError] = useState({ email: '', password: '', fullName: '' });
-  const [registerForm, setRegisterForm] = useState({ email: '', password: '', fullName: '' });
+  const [error, setError] = useState({ email: '', password: '', firstName: '' });
+  const [submitError, setSubmitError] = useState('');
+  const [registerForm, setRegisterForm] = useState({
+    email: '',
+    password: '',
+    firstName: '',
+    surname: '',
+    isSuperuser: false,
+  });
 
   const [loading, setLoading] = useState(false)
 
@@ -19,12 +41,13 @@ const SignUp = () => {
   const onRegister = (e) => {
     e.preventDefault();
     setLoading(true)
-    setError(false);
+    setError({ email: '', password: '', firstName: '' });
+    setSubmitError('');
 
-    if(registerForm.fullName.length <= 0)
+    if(registerForm.firstName.trim().length <= 0)
     {
       setLoading(false)
-      return setError({fullName: "Please Enter Your Full Name"}) 
+      return setError({firstName: "Please Enter First Name"})
     }
     if(registerForm.email.length <= 0)
     {
@@ -37,14 +60,21 @@ const SignUp = () => {
       return setError({password: "Please Enter Password"})
     }
 
-    client.register(registerForm.email, registerForm.password, registerForm.fullName)
+    client.register(
+      registerForm.email,
+      registerForm.password,
+      registerForm.firstName,
+      registerForm.surname,
+      registerForm.isSuperuser,
+    )
       .then( () => {
         navigate('/login')
       })
       .catch( (err) => {
         setLoading(false)
-        setError(true);
-        alert(err)
+        const detail = err?.response?.data?.detail;
+        const msg = formatErrorMessage(detail, '注册失败，请确认输入信息与后端服务状态');
+        setSubmitError(msg);
       });
   }
 
@@ -63,13 +93,23 @@ const SignUp = () => {
                 </div>
               </header>
               <form onSubmit={(e) => onRegister(e)}>
+                  {submitError ? (
+                    <p className="text-red-500 text-sm mb-3">{submitError}</p>
+                  ) : null}
                   <FormInput 
                     type={"text"} 
-                    name={"fullName"} 
-                    label={"Full Name"}
-                    error={error.fullName} 
-                    value={registerForm.fullName} 
-                    onChange={(e) => setRegisterForm({...registerForm, fullName: e.target.value })} 
+                    name={"firstName"} 
+                    label={"First Name"}
+                    error={error.firstName} 
+                    value={registerForm.firstName} 
+                    onChange={(e) => setRegisterForm({...registerForm, firstName: e.target.value })} 
+                  />
+                  <FormInput 
+                    type={"text"} 
+                    name={"surname"} 
+                    label={"Surname"}
+                    value={registerForm.surname} 
+                    onChange={(e) => setRegisterForm({...registerForm, surname: e.target.value })} 
                   />
                   <FormInput 
                     type={"email"} 
@@ -87,6 +127,14 @@ const SignUp = () => {
                     value={registerForm.password} 
                     onChange={(e) => setRegisterForm({...registerForm, password: e.target.value })} 
                   />
+                  <label className="flex items-center gap-2 mb-6 text-teal-700">
+                    <input
+                      type="checkbox"
+                      checked={registerForm.isSuperuser}
+                      onChange={(e) => setRegisterForm({...registerForm, isSuperuser: e.target.checked })}
+                    />
+                    is_superuser
+                  </label>
                 <Button title={"Create Account"} error={error.password} loading={loading} />       
               </form>
               
